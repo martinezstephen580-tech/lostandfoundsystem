@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Post an item · Campus Lost &amp; Found{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-xl">
+  <a href="{{ url_for('dashboard') }}" class="text-sm font-semibold text-ink/70 hover:text-ink">Back to items</a>
+  <h1 class="font-display text-3xl font-bold tracking-tight mt-2">Post an item</h1>
+  <p class="mt-1 text-ink/70">Add a clear photo, plus a second photo that proves the item is yours or that you really have it.</p>
+
+  <form method="post" enctype="multipart/form-data" id="post-form" class="mt-6 bg-white rounded-2xl p-5 space-y-5 shadow-sm">
+
+    <!-- Status -->
+    <fieldset>
+      <legend class="block text-sm font-semibold mb-2">What happened?</legend>
+      <div class="grid grid-cols-2 gap-3">
+        {% for s in statuses %}
+        <label class="cursor-pointer">
+          <input type="radio" name="status" value="{{ s }}" class="peer sr-only" required
+                 {{ 'checked' if form.get('status') == s }}>
+          <span class="block text-center rounded-xl border-2 border-ink/15 py-3 font-semibold
+                       peer-focus-visible:ring-2 peer-focus-visible:ring-ink
+                       {% if s == 'Lost' %}peer-checked:border-lost peer-checked:bg-lost-soft peer-checked:text-lost
+                       {% else %}peer-checked:border-found peer-checked:bg-found-soft peer-checked:text-found{% endif %}">
+            {{ 'I lost something' if s == 'Lost' else 'I found something' }}
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <div>
+      <label for="title" class="block text-sm font-semibold mb-1">Title</label>
+      <input id="title" name="title" type="text" required minlength="3" maxlength="100"
+             placeholder="Black Casio calculator" value="{{ form.get('title', '') }}"
+             class="w-full rounded-xl border border-ink/15 px-3.5 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ink">
+    </div>
+
+    <div>
+      <label for="category" class="block text-sm font-semibold mb-1">Category</label>
+      <select id="category" name="category" required
+              class="w-full rounded-xl border border-ink/15 px-3.5 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-ink">
+        <option value="" disabled {{ 'selected' if not form.get('category') }}>Choose a category</option>
+        {% for c in categories %}
+          <option value="{{ c }}" {{ 'selected' if form.get('category') == c }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="description" class="block text-sm font-semibold mb-1">Description</label>
+      <textarea id="description" name="description" rows="4" required minlength="5" maxlength="1000"
+                placeholder="Where and when it happened, plus details only the owner would know (without giving away the proof)."
+                class="w-full rounded-xl border border-ink/15 px-3.5 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ink">{{ form.get('description', '') }}</textarea>
+    </div>
+
+    <!-- Item photo -->
+    <div>
+      <label for="image" class="block text-sm font-semibold mb-1">Item photo</label>
+      <p class="text-xs text-ink/60 mb-2">A clear picture of the item. This is shown in the feed.</p>
+      <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" required data-preview="image-preview"
+             class="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-mist file:px-4 file:py-2.5 file:font-semibold file:text-ink hover:file:bg-ink/10">
+      <img id="image-preview" alt="" class="hidden mt-3 w-full max-h-64 object-cover rounded-xl">
+    </div>
+
+    <!-- Proof photo -->
+    <div class="rounded-xl bg-mist p-4">
+      <label for="proof" class="block text-sm font-semibold mb-1">Proof of ownership photo</label>
+      <p class="text-xs text-ink/70 mb-2">
+        Required. Examples: you holding the item, the receipt, or a matching serial number.
+        Only you can open this photo from the feed, so staff or the owner can ask you to show it.
+      </p>
+      <input id="proof" name="proof" type="file" accept="image/jpeg,image/png,image/webp" required data-preview="proof-preview"
+             class="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2.5 file:font-semibold file:text-ink hover:file:bg-white/70">
+      <img id="proof-preview" alt="" class="hidden mt-3 w-full max-h-64 object-cover rounded-xl">
+    </div>
+
+    <p id="file-error" class="hidden rounded-xl bg-lost-soft text-lost text-sm font-medium px-4 py-3" role="alert"></p>
+
+    <button type="submit" id="submit-btn"
+            class="w-full rounded-xl bg-ink text-white font-semibold py-3.5 hover:bg-[#1d2f55] disabled:opacity-60 focus:outline-none focus-visible:ring-4 focus-visible:ring-ink/30">
+      Publish post
+    </button>
+  </form>
+</div>
+
+<script>
+  const MAX = 5 * 1024 * 1024;
+  const err = document.getElementById('file-error');
+
+  document.querySelectorAll('input[type=file]').forEach(input => {
+    input.addEventListener('change', () => {
+      const file = input.files[0];
+      const preview = document.getElementById(input.dataset.preview);
+      err.classList.add('hidden');
+      if (!file) { preview.classList.add('hidden'); return; }
+      if (file.size > MAX) {
+        input.value = '';
+        preview.classList.add('hidden');
+        err.textContent = 'That photo is over 5 MB. Choose a smaller one.';
+        err.classList.remove('hidden');
+        return;
+      }
+      preview.src = URL.createObjectURL(file);
+      preview.classList.remove('hidden');
+    });
+  });
+
+  document.getElementById('post-form').addEventListener('submit', () => {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Uploading photos...';
+  });
+</script>
+{% endblock %}

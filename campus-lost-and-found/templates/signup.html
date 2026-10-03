@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Sign up · Campus Lost &amp; Found{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-md">
+  <h1 class="font-display text-3xl font-bold tracking-tight mt-4">Create your account</h1>
+  <p class="mt-2 text-ink/70">Your name shows on the posts you make, so other students know who to contact.</p>
+
+  <form method="post" class="mt-6 bg-white rounded-2xl p-5 space-y-4 shadow-sm">
+    <div>
+      <label for="full_name" class="block text-sm font-semibold mb-1">Full name</label>
+      <input id="full_name" name="full_name" type="text" required minlength="2" autocomplete="name"
+             class="w-full rounded-xl border border-ink/15 px-3.5 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ink">
+    </div>
+    <div>
+      <label for="email" class="block text-sm font-semibold mb-1">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="email" inputmode="email"
+             class="w-full rounded-xl border border-ink/15 px-3.5 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ink">
+    </div>
+    <div>
+      <label for="password" class="block text-sm font-semibold mb-1">Password</label>
+      <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password"
+             class="w-full rounded-xl border border-ink/15 px-3.5 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ink">
+      <p class="mt-1 text-xs text-ink/60">At least 8 characters.</p>
+    </div>
+    <button type="submit" class="w-full rounded-xl bg-ink text-white font-semibold py-3.5 hover:bg-[#1d2f55] focus:outline-none focus-visible:ring-4 focus-visible:ring-ink/30">
+      Create account
+    </button>
+  </form>
+
+  <p class="mt-5 text-center text-sm text-ink/70">
+    Already registered? <a href="{{ url_for('login') }}" class="font-semibold text-ink underline underline-offset-2">Log in</a>
+  </p>
+</div>
+{% endblock %}
